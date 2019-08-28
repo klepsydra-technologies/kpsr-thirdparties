@@ -1,0 +1,15 @@
+[submodule "googletest"]
+	path = googletest
+	url = https://github.com/klepsydra-technologies/googletest.git
+[submodule "pistache"]
+	path = pistache
+	url = https://github.com/klepsydra-technologies/pistache.git
+[submodule "spdlog"]
+	path = spdlog
+	url = https://github.com/klepsydra-technologies/spdlog.git
+[submodule "cereal"]
+	path = cereal
+	url = https://github.com/klepsydra-technologies/cereal.git
+[submodule "concurrentqueue"]
+	path = concurrentqueue
+	url = https://github.com/klepsydra-technologies/concurrentqueue.git
