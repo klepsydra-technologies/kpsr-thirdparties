@@ -1,7 +1,7 @@
 #!/bin/bash
 
-THIRDPARTIES_PATH=/opt/klepsydra/thirdparties
-SOURCES_PATH=`pwd`
+THIRDPARTIES_PATH="/opt/klepsydra/thirdparties"
+SOURCES_PATH="${PWD}"
 BUILD_YAML=""
 BUILD_ZMQ=""
 
@@ -9,8 +9,8 @@ usage() {
     echo "Usage: $0 [options]" 1>&2
     echo "" 1>&2
     echo "OPTIONS:" 1>&2
-    echo "-i <installation folder> Default: /opt/klepsydra/thirdparties" 1>&2
-    echo "-p <sources path> Default: $PWD" 1>&2
+    echo "-i <installation folder> Default: ${THIRDPARTIES_PATH}" 1>&2
+    echo "-p <sources path> Default: ${SOURCES_PATH}" 1>&2
     echo "-y Build yaml-cpp" 1>&2
     echo "-z Build cppzmq" 1>&2
     exit 1
@@ -88,7 +88,10 @@ if [ "$BUILD_YAML" ]; then
     git checkout yaml-cpp-0.6.2
     mkdir build
     cd build
-    cmake -DBUILD_SHARED_LIBS=ON ..
+    cmake \
+        -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
+        ..
     make -j
     sudo make install
 
@@ -102,7 +105,9 @@ if [ "$BUILD_ZMQ" ]; then
     cd libzmq
     mkdir build
     cd build
-    cmake ..
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
+        ..
     make -j
     sudo make install
 
@@ -114,7 +119,9 @@ if [ "$BUILD_ZMQ" ]; then
     cd cppzmq
     mkdir build
     cd build
-    cmake ..
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
+        ..
     make -j
     sudo make install
 
@@ -126,7 +133,9 @@ if [ "$BUILD_ZMQ" ]; then
     cd czmq
     mkdir build
     cd build
-    cmake ..
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
+        ..
     make -j
     sudo make install
 
