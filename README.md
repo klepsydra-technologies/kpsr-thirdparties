@@ -12,16 +12,19 @@
 
 ## System installation
 
-	sudo apt install build-essentials
+	sudo apt install build-essential
 	sudo apt install git
 	sudo apt install cmake
-	git clone https://github.com/google/googletest.git
+	sudo apt install libssl-dev
+	sudo apt install libcurl4-gnutls-dev
 
 ### Installation
 
 Run the script ./build_3parties.sh with the following parameters:
 - -p: Source folder location. Default is current folder
-- -i: Installation path. Defatul is /opt/klepsydra/thirdparties
+- -i: Installation path. Default is /opt/klepsydra/thirdparties
+- -y: Build and install yaml-cpp
+- -z: Build and install cppzmq
 
 Example
 ```
