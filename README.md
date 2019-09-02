@@ -21,7 +21,9 @@
 
 Run the script ./build_3parties.sh with the following parameters:
 - -p: Source folder location. Default is current folder
-- -i: Installation path. Defatul is /opt/klepsydra/thirdparties
+- -i: Installation path. Default is /opt/klepsydra/thirdparties
+- -y: Build and install yaml-cpp
+- -z: Build and install cppzmq
 
 Example
 ```
