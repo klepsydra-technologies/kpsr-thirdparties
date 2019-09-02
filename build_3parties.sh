@@ -19,11 +19,11 @@ usage() {
 while getopts "i:p:yz" o; do
     case "${o}" in
         i)
-            THIRDPARTIES_PATH=${OPTARG}
+            THIRDPARTIES_PATH=$(realpath ${OPTARG})
             ((s == 45 || s == 90)) || usage
             ;;
         p)
-            SOURCES_PATH=${OPTARG}
+            SOURCES_PATH=$(realpath ${OPTARG})
             ;;
         y)
             BUILD_YAML="true"
