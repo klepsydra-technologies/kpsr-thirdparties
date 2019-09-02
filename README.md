@@ -12,10 +12,11 @@
 
 ## System installation
 
-	sudo apt install build-essentials
+	sudo apt install build-essential
 	sudo apt install git
 	sudo apt install cmake
-	git clone https://github.com/google/googletest.git
+	sudo apt install libssl-dev
+	sudo apt install libcurl4-gnutls-dev
 
 ### Installation
 
