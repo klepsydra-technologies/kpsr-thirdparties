@@ -114,7 +114,7 @@ if [ "$BUILD_YAML" ]; then
         -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
     make
-    sudo make install
+    $SUDO_CMD make install
 
     popd
 fi
@@ -132,7 +132,7 @@ if [ "$BUILD_ZMQ" ]; then
         -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
     make
-    sudo make install
+    $SUDO_CMD make install
 
     popd
 
@@ -148,7 +148,7 @@ if [ "$BUILD_ZMQ" ]; then
         -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
     make
-    sudo make install
+    $SUDO_CMD make install
 
     popd
 
@@ -164,7 +164,7 @@ if [ "$BUILD_ZMQ" ]; then
         -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
     make
-    sudo make install
+    $SUDO_CMD make install
 
     popd
 fi
