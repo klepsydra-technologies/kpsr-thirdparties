@@ -24,7 +24,6 @@ while getopts "i:p:yz" o; do
     case "${o}" in
         i)
             THIRDPARTIES_PATH=$(realpath ${OPTARG})
-            ((s == 45 || s == 90)) || usage
             ;;
         p)
             SOURCES_PATH=$(realpath ${OPTARG})
