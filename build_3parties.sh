@@ -1,9 +1,13 @@
 #!/bin/bash
 
+# Abort on errors
+set -e
+
 THIRDPARTIES_PATH="/opt/klepsydra/thirdparties"
 SOURCES_PATH="${PWD}"
 BUILD_YAML=""
 BUILD_ZMQ=""
+SUDO_CMD=""
 
 usage() {
     echo "Usage: $0 [options]" 1>&2
@@ -20,7 +24,6 @@ while getopts "i:p:yz" o; do
     case "${o}" in
         i)
             THIRDPARTIES_PATH=$(realpath ${OPTARG})
-            ((s == 45 || s == 90)) || usage
             ;;
         p)
             SOURCES_PATH=$(realpath ${OPTARG})
@@ -43,13 +46,29 @@ echo "SOURCES_PATH = ${SOURCES_PATH}"
 echo "BUILD_YAML = ${BUILD_YAML}"
 echo "BUILD_ZMQ = ${BUILD_ZMQ}"
 
-if [ -w "${THIRDPARTIES_PATH}" ]; then
-    SUDO_CMD=""
-else
+# Temporarily disable abort on errors
+set +e
+
+git clone https://github.com/klepsydra-technologies/googletest.git
+git clone https://github.com/klepsydra-technologies/pistache.git
+git clone https://github.com/klepsydra-technologies/spdlog.git
+git clone https://github.com/klepsydra-technologies/cereal.git
+git clone https://github.com/klepsydra-technologies/concurrentqueue.git
+
+# Try to make the directory
+# If the directory cannot be made, then we need sudo
+mkdir -p "${THIRDPARTIES_PATH}"
+if [ $? -ne 0 ]; then
     SUDO_CMD="sudo"
 fi
 
-git submodule update --init
+# Abort on errors
+set -e
+
+# If the directory was already made, but we don't have write permissions, then we need sudo
+if [ ! -w "${THIRDPARTIES_PATH}" ]; then
+    SUDO_CMD="sudo"
+fi
 
 $SUDO_CMD rm -rf $THIRDPARTIES_PATH/*
 
@@ -83,7 +102,9 @@ popd
 if [ "$BUILD_YAML" ]; then
     pushd .
 
+    set +e
     git clone https://github.com/jbeder/yaml-cpp
+    set -e
     cd yaml-cpp
     git checkout yaml-cpp-0.6.2
     mkdir build
@@ -101,7 +122,9 @@ fi
 if [ "$BUILD_ZMQ" ]; then
     pushd .
 
+    set +e
     git clone https://github.com/zeromq/libzmq.git
+    set -e
     cd libzmq
     mkdir build
     cd build
@@ -115,7 +138,9 @@ if [ "$BUILD_ZMQ" ]; then
 
     pushd .
 
+    set +e
     git clone https://github.com/zeromq/cppzmq.git
+    set -e
     cd cppzmq
     mkdir build
     cd build
@@ -129,7 +154,9 @@ if [ "$BUILD_ZMQ" ]; then
 
     pushd .
 
+    set +e
     git clone https://github.com/zeromq/czmq.git
+    set -e
     cd czmq
     mkdir build
     cd build
