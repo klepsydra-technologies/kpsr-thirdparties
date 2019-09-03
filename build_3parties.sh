@@ -94,7 +94,7 @@ cmake -G "Unix Makefiles" \
      -DPISTACHE_USE_SSL=true \
      -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH/pistache \
      ../
-make -j
+make
 $SUDO_CMD make install
 
 popd
@@ -113,7 +113,7 @@ if [ "$BUILD_YAML" ]; then
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
-    make -j
+    make
     sudo make install
 
     popd
@@ -131,7 +131,7 @@ if [ "$BUILD_ZMQ" ]; then
     cmake \
         -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
-    make -j
+    make
     sudo make install
 
     popd
@@ -147,7 +147,7 @@ if [ "$BUILD_ZMQ" ]; then
     cmake \
         -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
-    make -j
+    make
     sudo make install
 
     popd
@@ -163,7 +163,7 @@ if [ "$BUILD_ZMQ" ]; then
     cmake \
         -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
-    make -j
+    make
     sudo make install
 
     popd
