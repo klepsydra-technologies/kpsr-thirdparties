@@ -4,9 +4,9 @@
 set -e
 
 THIRDPARTIES_PATH="/opt/klepsydra/thirdparties"
-SOURCES_PATH="${PWD}"
 BUILD_YAML=""
 BUILD_ZMQ=""
+BUILD_ROS=""
 SUDO_CMD=""
 
 usage() {
@@ -14,9 +14,10 @@ usage() {
     echo "" 1>&2
     echo "OPTIONS:" 1>&2
     echo "-i <installation folder> Default: ${THIRDPARTIES_PATH}" 1>&2
-    echo "-p <sources path> Default: ${SOURCES_PATH}" 1>&2
+    echo "-r Install ROS" 1>&2
     echo "-y Build yaml-cpp" 1>&2
     echo "-z Build cppzmq" 1>&2
+    echo "-s Use sudo" 1>&2
     exit 1
 }
 
@@ -25,14 +26,17 @@ while getopts "i:p:yz" o; do
         i)
             THIRDPARTIES_PATH=$(realpath ${OPTARG})
             ;;
-        p)
-            SOURCES_PATH=$(realpath ${OPTARG})
+        r)
+            BUILD_ROS="true"
             ;;
         y)
             BUILD_YAML="true"
             ;;
         z)
             BUILD_ZMQ="true"
+            ;;
+        s)
+            SUDO_CMD="sudo"
             ;;
         *)
             usage
@@ -42,62 +46,10 @@ done
 shift $((OPTIND-1))
 
 echo "THIRDPARTIES_PATH = ${THIRDPARTIES_PATH}"
-echo "SOURCES_PATH = ${SOURCES_PATH}"
 echo "BUILD_YAML = ${BUILD_YAML}"
 echo "BUILD_ZMQ = ${BUILD_ZMQ}"
-
-# Temporarily disable abort on errors
-set +e
-
-git clone https://github.com/klepsydra-technologies/googletest.git
-git clone https://github.com/klepsydra-technologies/pistache.git
-git clone https://github.com/klepsydra-technologies/spdlog.git
-git clone https://github.com/klepsydra-technologies/cereal.git
-git clone https://github.com/klepsydra-technologies/concurrentqueue.git
-
-# Try to make the directory
-# If the directory cannot be made, then we need sudo
-mkdir -p "${THIRDPARTIES_PATH}"
-if [ $? -ne 0 ]; then
-    SUDO_CMD="sudo"
-fi
-
-# Abort on errors
-set -e
-
-# If the directory was already made, but we don't have write permissions, then we need sudo
-if [ ! -w "${THIRDPARTIES_PATH}" ]; then
-    SUDO_CMD="sudo"
-fi
-
-$SUDO_CMD rm -rf $THIRDPARTIES_PATH/*
-
-$SUDO_CMD mkdir -p $THIRDPARTIES_PATH/include
-
-$SUDO_CMD cp $SOURCES_PATH/concurrentqueue/*.h $THIRDPARTIES_PATH/include/
-$SUDO_CMD cp -r $SOURCES_PATH/cereal/include/* $THIRDPARTIES_PATH/include/
-$SUDO_CMD cp -r $SOURCES_PATH/spdlog/include/* $THIRDPARTIES_PATH/include/
-$SUDO_CMD cp -r $SOURCES_PATH/googletest $THIRDPARTIES_PATH/
-
-pushd .
-
-cd pistache
-git submodule update --init
-rm -rf $SOURCES_PATH/pistache/build
-mkdir -p build
-cd build
-cmake -G "Unix Makefiles" \
-     -DCMAKE_BUILD_TYPE=Release \
-     -DPISTACHE_BUILD_EXAMPLES=true \
-     -DPISTACHE_BUILD_TESTS=true \
-     -DPISTACHE_BUILD_DOCS=false \
-     -DPISTACHE_USE_SSL=true \
-     -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH/pistache \
-     ../
-make
-$SUDO_CMD make install
-
-popd
+echo "BUILD_ROS = ${BUILD_ROS}"
+echo "SUDO_CMD = ${SUDO_CMD}"
 
 if [ "$BUILD_YAML" ]; then
     pushd .

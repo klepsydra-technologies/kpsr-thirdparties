@@ -1,0 +1,24 @@
+FROM ubuntu:18.04 AS builder
+
+ENV THIRDPARTIES_PATH /opt/klepsydra/thirdparties/
+# System Dependencies.
+
+RUN apt update && apt-get install libssl-dev libcurl4-gnutls-dev build-essential git cmake -y --fix-missing
+
+WORKDIR /var/tmp
+
+# Klepsydra
+COPY . kpsr-thirdparties
+
+RUN cd kpsr-thirdparties \
+    && ./build_3parties.sh -i /opt/klepsydra/thirdparties -y -z
+
+ARG BUILD_ID
+LABEL kpsr-thirdparties=builder
+LABEL BUILD_ID=${BUILD_ID}
+
+FROM ubuntu:18.04
+
+COPY --from=builder /opt/klepsydra/ /opt/klepsydra/
+WORKDIR /opt/
+
