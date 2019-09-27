@@ -4,9 +4,10 @@
 set -e
 
 THIRDPARTIES_PATH="/opt/klepsydra/thirdparties"
-SOURCES_PATH="${PWD}"
+BUILD_PISTACHE=""
 BUILD_YAML=""
 BUILD_ZMQ=""
+BUILD_ROS=""
 SUDO_CMD=""
 
 usage() {
@@ -14,25 +15,33 @@ usage() {
     echo "" 1>&2
     echo "OPTIONS:" 1>&2
     echo "-i <installation folder> Default: ${THIRDPARTIES_PATH}" 1>&2
-    echo "-p <sources path> Default: ${SOURCES_PATH}" 1>&2
+    echo "-r Install ROS" 1>&2
     echo "-y Build yaml-cpp" 1>&2
+    echo "-p Build pistache" 1>&2
     echo "-z Build cppzmq" 1>&2
+    echo "-s Use sudo" 1>&2
     exit 1
 }
 
-while getopts "i:p:yz" o; do
+while getopts "irypz" o; do
     case "${o}" in
         i)
             THIRDPARTIES_PATH=$(realpath ${OPTARG})
             ;;
-        p)
-            SOURCES_PATH=$(realpath ${OPTARG})
+        r)
+            BUILD_ROS="true"
             ;;
         y)
             BUILD_YAML="true"
             ;;
         z)
             BUILD_ZMQ="true"
+            ;;
+        p)
+            BUILD_PISTACHE="true"
+            ;;
+        s)
+            SUDO_CMD="sudo"
             ;;
         *)
             usage
@@ -42,60 +51,34 @@ done
 shift $((OPTIND-1))
 
 echo "THIRDPARTIES_PATH = ${THIRDPARTIES_PATH}"
-echo "SOURCES_PATH = ${SOURCES_PATH}"
 echo "BUILD_YAML = ${BUILD_YAML}"
 echo "BUILD_ZMQ = ${BUILD_ZMQ}"
+echo "BUILD_ROS = ${BUILD_ROS}"
+echo "SUDO_CMD = ${SUDO_CMD}"
 
-# Temporarily disable abort on errors
-set +e
 
-git clone https://github.com/klepsydra-technologies/googletest.git
-git clone https://github.com/klepsydra-technologies/pistache.git
-git clone https://github.com/klepsydra-technologies/spdlog.git
-git clone https://github.com/klepsydra-technologies/cereal.git
-git clone https://github.com/klepsydra-technologies/concurrentqueue.git
-
-# Try to make the directory
-# If the directory cannot be made, then we need sudo
-mkdir -p "${THIRDPARTIES_PATH}"
-if [ $? -ne 0 ]; then
-    SUDO_CMD="sudo"
-fi
-
-# Abort on errors
-set -e
-
-# If the directory was already made, but we don't have write permissions, then we need sudo
-if [ ! -w "${THIRDPARTIES_PATH}" ]; then
-    SUDO_CMD="sudo"
-fi
-
-$SUDO_CMD rm -rf $THIRDPARTIES_PATH/*
-
-$SUDO_CMD mkdir -p $THIRDPARTIES_PATH/include
-
-$SUDO_CMD cp $SOURCES_PATH/concurrentqueue/*.h $THIRDPARTIES_PATH/include/
-$SUDO_CMD cp -r $SOURCES_PATH/cereal/include/* $THIRDPARTIES_PATH/include/
-$SUDO_CMD cp -r $SOURCES_PATH/spdlog/include/* $THIRDPARTIES_PATH/include/
-$SUDO_CMD cp -r $SOURCES_PATH/googletest $THIRDPARTIES_PATH/
+$SUDO_CMD rm -rf $THIRDPARTIES_PATH
+$SUDO_CMD mkdir -p $THIRDPARTIES_PATH
 
 pushd .
 
-cd pistache
-git submodule update --init
-rm -rf $SOURCES_PATH/pistache/build
-mkdir -p build
-cd build
-cmake -G "Unix Makefiles" \
-     -DCMAKE_BUILD_TYPE=Release \
-     -DPISTACHE_BUILD_EXAMPLES=true \
-     -DPISTACHE_BUILD_TESTS=true \
-     -DPISTACHE_BUILD_DOCS=false \
-     -DPISTACHE_USE_SSL=true \
-     -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH/pistache \
-     ../
-make
-$SUDO_CMD make install
+if [ "$BUILD_PISTACHE" ]; then
+   git clone https://github.com/klepsydra-technologies/pistache.git
+   cd pistache
+   git submodule update --init
+   mkdir -p build
+   cd build
+   cmake -G "Unix Makefiles" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DPISTACHE_BUILD_EXAMPLES=true \
+        -DPISTACHE_BUILD_TESTS=true \
+        -DPISTACHE_BUILD_DOCS=false \
+        -DPISTACHE_USE_SSL=true \
+        -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH/pistache \
+        ../
+   make
+   $SUDO_CMD make install
+fi
 
 popd
 
@@ -111,7 +94,6 @@ if [ "$BUILD_YAML" ]; then
     cd build
     cmake \
         -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
     make
     $SUDO_CMD make install
@@ -167,5 +149,26 @@ if [ "$BUILD_ZMQ" ]; then
     $SUDO_CMD make install
 
     popd
+fi
+
+if [ "$BUILD_ROS" ]; then
+   $SUDO_CMD apt update
+   $SUDO_CMD . /etc/os-release
+   $SUDO_CMD echo "deb http://packages.ros.org/ros/ubuntu $VERSION_CODENAME main" > /etc/apt/sources.list.d/ros-latest.list
+   $SUDO_CMD apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+   cat /etc/apt/sources.list.d/ros-latest.list
+
+   $SUDO_CMD apt update
+   $SUDO_CMD apt install ros-melodic-desktop-full -y 
+   $SUDO_CMD apt dist-upgrade -y 
+
+   source /opt/ros/melodic/setup.bash
+   $SUDO_CMD apt install python-rosinstall -y 
+   $SUDO_CMD apt install ca-cacert -y
+
+   $SUDO_CMD rosdep init
+   rosdep update
+
+   $SUDO_CMD apt install ros-melodic-mavros ros-melodic-mavros-extras -y 
 fi
 
