@@ -121,3 +121,22 @@ if [ "$BUILD_ZMQ" ]; then
     popd
 fi
 
+if [ "$BUILD_ROS" ]; then
+   $SUDO_CMD apt update
+   $SUDO_CMD sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+   $SUDO_CMD apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+
+   $SUDO_CMD apt update
+   $SUDO_CMD apt --assume-yes install ros-melodic-desktop-full
+   $SUDO_CMD apt dist-upgrade
+
+   source /opt/ros/melodic/setup.bash
+   $SUDO_CMD apt --assume-yes install python-rosinstall
+   $SUDO_CMD apt --assume-yes install ca-cacert
+
+   $SUDO_CMD rosdep init
+   rosdep update
+
+   $SUDO_CMD apt --assume-yes install ros-melodic-mavros ros-melodic-mavros-extras 
+fi
+
