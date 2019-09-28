@@ -21,7 +21,7 @@ usage() {
     exit 1
 }
 
-while getopts "i:p:yz" o; do
+while getopts "i:p:ryz" o; do
     case "${o}" in
         i)
             THIRDPARTIES_PATH=$(realpath ${OPTARG})
@@ -123,20 +123,22 @@ fi
 
 if [ "$BUILD_ROS" ]; then
    $SUDO_CMD apt update
-   $SUDO_CMD sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+   $SUDO_CMD . /etc/os-release
+   $SUDO_CMD echo "deb http://packages.ros.org/ros/ubuntu $VERSION_CODENAME main" > /etc/apt/sources.list.d/ros-latest.list
    $SUDO_CMD apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+   cat /etc/apt/sources.list.d/ros-latest.list
 
    $SUDO_CMD apt update
-   $SUDO_CMD apt --assume-yes install ros-melodic-desktop-full
-   $SUDO_CMD apt dist-upgrade
+   $SUDO_CMD apt install ros-melodic-desktop-full -y 
+   $SUDO_CMD apt dist-upgrade -y 
 
    source /opt/ros/melodic/setup.bash
-   $SUDO_CMD apt --assume-yes install python-rosinstall
-   $SUDO_CMD apt --assume-yes install ca-cacert
+   $SUDO_CMD apt install python-rosinstall -y 
+   $SUDO_CMD apt install ca-cacert -y
 
    $SUDO_CMD rosdep init
    rosdep update
 
-   $SUDO_CMD apt --assume-yes install ros-melodic-mavros ros-melodic-mavros-extras 
+   $SUDO_CMD apt install ros-melodic-mavros ros-melodic-mavros-extras -y 
 fi
 

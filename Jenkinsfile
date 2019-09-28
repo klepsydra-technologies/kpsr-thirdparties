@@ -7,27 +7,18 @@ pipeline {
                 echo 'Pull dependencies from repository'
                 sh 'rm  ~/.dockercfg || true'
                 sh 'rm ~/.docker/config.json || true'
-
-                sh 'docker build -f Dockerfile_ZY . --build-arg="BUILD_ID=${BUILD_ID}" --no-cache'
-
-                // Pruning
-                sh 'docker container prune --force --filter label=kpsr-core=builder  --filter  label=BUILD_ID=${BUILD_ID}'
-                sh 'docker image prune --force --filter label=kpsr-core=builder  --filter  label=BUILD_ID=${BUILD_ID}'
-
-                echo 'Pull dependencies from repository'
-                sh 'rm  ~/.dockercfg || true'
-                sh 'rm ~/.docker/config.json || true'
-
-                sh 'docker build -f Dockerfile_ROS . --build-arg="BUILD_ID=${BUILD_ID}" --no-cache'
+                
+                # Build ZMQ 
+                sh 'docker build -f Dockerfile . --build-arg="BUILD_ID=${BUILD_ID}" --build-arg="third_party_flags='-y -z'" -t kpsr-thirdparties:ZMQ'
+                sh 'docker build -f Dockerfile . --build-arg="BUILD_ID=${BUILD_ID}" --build-arg="third_party_flags='-r'" -t kpsr-thirdparties:ROSS'
 
                 // Pruning
-                sh 'docker container prune --force --filter label=kpsr-core=builder  --filter  label=BUILD_ID=${BUILD_ID}'
-                sh 'docker image prune --force --filter label=kpsr-core=builder  --filter  label=BUILD_ID=${BUILD_ID}'
+                sh 'docker image prune --force --filter label=kpsr-thirdparties=builder  --filter  label=BUILD_ID=${BUILD_ID}'
             }
         }
-        stage('Test') {
+        stage('Publish') {
             steps {
-                echo 'Testing..'
+                echo 'Publish.'
             }
         }
     }
