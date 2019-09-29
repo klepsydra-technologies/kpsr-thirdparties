@@ -1,5 +1,6 @@
 FROM ubuntu:18.04 AS builder
-ARG third_party_flags='-y -z' 
+ARG third_party_flags='-y -z'
+ 
 # System Dependencies.
 ARG BUILD_ID='local'
 LABEL kpsr-thirdparties=builder
