@@ -20,7 +20,7 @@ pipeline {
                 script {
                     docker.withRegistry("https://${kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
                         sh "docker tag kpsr-thirdparties:ZMQ_${BUILD_ID} ${kpsrThirdPartiesECR}:ZMQ && docker push ${kpsrThirdPartiesECR}:ZMQ"
-                        sh "docker tag kpsr-thirdparties:ROS_${BUILD_ID} ${kpsrThirdPartiesECR}:ZMQ && docker push ${kpsrThirdPartiesECR}:ROS"
+                        sh "docker tag kpsr-thirdparties:ROS_${BUILD_ID} ${kpsrThirdPartiesECR}:ROS && docker push ${kpsrThirdPartiesECR}:ROS"
                     }
                 }
             }
