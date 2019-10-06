@@ -18,6 +18,7 @@ pipeline {
                 // Build ZMQ and ROS
                 sh "docker build -f Dockerfile_ZMQ . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:ZMQ_${BUILD_ID}"
                 sh "docker build -f Dockerfile_ROS . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:ROS_${BUILD_ID}"
+                sh "docker build -f Dockerfile_OCV . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:OCV_${BUILD_ID}"
             }
         }
         stage('Publish') {
@@ -27,6 +28,7 @@ pipeline {
                     docker.withRegistry("https://${kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
                         sh "docker tag kpsr-thirdparties:ZMQ_${BUILD_ID} ${kpsrThirdPartiesECR}:ZMQ && docker push ${kpsrThirdPartiesECR}:ZMQ"
                         sh "docker tag kpsr-thirdparties:ROS_${BUILD_ID} ${kpsrThirdPartiesECR}:ROS && docker push ${kpsrThirdPartiesECR}:ROS"
+                        sh "docker tag kpsr-thirdparties:OCV_${BUILD_ID} ${kpsrThirdPartiesECR}:ZMQ && docker push ${kpsrThirdPartiesECR}:OCV"
                     }
                 }
             }

@@ -8,6 +8,7 @@ BUILD_PISTACHE=""
 BUILD_YAML=""
 BUILD_ZMQ=""
 BUILD_ROS=""
+BUILD_OCV=""
 SUDO_CMD=""
 
 usage() {
@@ -19,11 +20,12 @@ usage() {
     echo "-y Build yaml-cpp" 1>&2
     echo "-p Build pistache" 1>&2
     echo "-z Build cppzmq" 1>&2
+    echo "-o Build opencv 3.4.1" 1>&2
     echo "-s Use sudo" 1>&2
     exit 1
 }
 
-while getopts "irypz" o; do
+while getopts "irypzo" o; do
     case "${o}" in
         i)
             THIRDPARTIES_PATH=$(realpath ${OPTARG})
@@ -43,6 +45,9 @@ while getopts "irypz" o; do
         s)
             SUDO_CMD="sudo"
             ;;
+        o)
+            BUILD_OCV="true"
+            ;;
         *)
             usage
             ;;
@@ -52,6 +57,7 @@ shift $((OPTIND-1))
 
 echo "THIRDPARTIES_PATH = ${THIRDPARTIES_PATH}"
 echo "BUILD_YAML = ${BUILD_YAML}"
+echo "BUILD_YAML = ${BUILD_OCV}"
 echo "BUILD_ZMQ = ${BUILD_ZMQ}"
 echo "BUILD_ROS = ${BUILD_ROS}"
 echo "SUDO_CMD = ${SUDO_CMD}"
@@ -170,5 +176,18 @@ if [ "$BUILD_ROS" ]; then
    rosdep update
 
    $SUDO_CMD apt install ros-melodic-mavros ros-melodic-mavros-extras -y 
+fi
+
+if [ "$BUILD_OCV" ]; then
+    wget https://github.com/opencv/opencv/archive/3.4.1.tar.gz
+    tar zxvf 3.4.1.tar.gz
+
+    cd opencv-3.4.1
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+    make -j4
+    $SUDO_CMD make install
 fi
 

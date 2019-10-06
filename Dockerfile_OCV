@@ -1,5 +1,5 @@
 FROM ubuntu:18.04 AS builder
-ARG third_party_flags='-yzo'
+ARG third_party_flags='-o'
  
 # System Dependencies.
 ARG BUILD_ID='local'
@@ -22,11 +22,6 @@ RUN cd kpsr-thirdparties \
 
 
 FROM ubuntu:18.04
-
-COPY --from=builder /opt/klepsydra/ /opt/klepsydra/
-COPY --from=builder /usr/local/include/yaml-cpp/ /usr/local/include/yaml-cpp/
-COPY --from=builder /usr/local/lib/cmake/yaml-cpp/ /usr/local/lib/cmake/yaml-cpp/
-COPY --from=builder /usr/local/lib/libyaml* /usr/local/lib/
 
 COPY --from=builder /usr/local/include/opencv/ /usr/local/include/opencv/
 COPY --from=builder /usr/local/lib/libopencv* /usr/local/lib/
