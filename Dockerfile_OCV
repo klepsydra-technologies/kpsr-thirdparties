@@ -1,0 +1,33 @@
+FROM ubuntu:18.04 AS builder
+ARG third_party_flags='-o'
+ 
+# System Dependencies.
+ARG BUILD_ID='local'
+LABEL kpsr-thirdparties=builder
+LABEL BUILD_ID=${BUILD_ID}
+
+RUN apt update && apt-get install wget libssl-dev libcurl4-gnutls-dev build-essential git cmake -y --fix-missing
+
+ENV TZ=Europe/Minsk
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /var/tmp
+
+# Klepsydra
+COPY . kpsr-thirdparties
+
+RUN cd kpsr-thirdparties \ 
+    && echo "./build_3parties.sh $third_party_flags" \
+    && ./build_3parties.sh $third_party_flags
+
+
+FROM ubuntu:18.04
+
+COPY --from=builder /usr/local/include/opencv/ /usr/local/include/opencv/
+COPY --from=builder /usr/local/include/opencv2/ /usr/local/include/opencv2/
+COPY --from=builder /usr/local/lib/libopencv* /usr/local/lib/
+COPY --from=builder /usr/local/bin/opencv* /usr/local/bin/
+COPY --from=builder /usr/local/share/OpenCV /usr/local/share/OpenCV
+
+WORKDIR /opt/
+

@@ -4,9 +4,11 @@
 set -e
 
 THIRDPARTIES_PATH="/opt/klepsydra/thirdparties"
+BUILD_PISTACHE=""
 BUILD_YAML=""
 BUILD_ZMQ=""
 BUILD_ROS=""
+BUILD_OCV=""
 SUDO_CMD=""
 
 usage() {
@@ -16,12 +18,14 @@ usage() {
     echo "-i <installation folder> Default: ${THIRDPARTIES_PATH}" 1>&2
     echo "-r Install ROS" 1>&2
     echo "-y Build yaml-cpp" 1>&2
+    echo "-p Build pistache" 1>&2
     echo "-z Build cppzmq" 1>&2
+    echo "-o Build opencv 3.4.1" 1>&2
     echo "-s Use sudo" 1>&2
     exit 1
 }
 
-while getopts "i:p:ryz" o; do
+while getopts "irypzso" o; do
     case "${o}" in
         i)
             THIRDPARTIES_PATH=$(realpath ${OPTARG})
@@ -35,8 +39,14 @@ while getopts "i:p:ryz" o; do
         z)
             BUILD_ZMQ="true"
             ;;
+        p)
+            BUILD_PISTACHE="true"
+            ;;
         s)
             SUDO_CMD="sudo"
+            ;;
+        o)
+            BUILD_OCV="true"
             ;;
         *)
             usage
@@ -47,9 +57,36 @@ shift $((OPTIND-1))
 
 echo "THIRDPARTIES_PATH = ${THIRDPARTIES_PATH}"
 echo "BUILD_YAML = ${BUILD_YAML}"
+echo "BUILD_YAML = ${BUILD_OCV}"
 echo "BUILD_ZMQ = ${BUILD_ZMQ}"
 echo "BUILD_ROS = ${BUILD_ROS}"
 echo "SUDO_CMD = ${SUDO_CMD}"
+
+
+$SUDO_CMD rm -rf $THIRDPARTIES_PATH
+$SUDO_CMD mkdir -p $THIRDPARTIES_PATH
+
+pushd .
+
+if [ "$BUILD_PISTACHE" ]; then
+   git clone https://github.com/klepsydra-technologies/pistache.git
+   cd pistache
+   git submodule update --init
+   mkdir -p build
+   cd build
+   cmake -G "Unix Makefiles" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DPISTACHE_BUILD_EXAMPLES=true \
+        -DPISTACHE_BUILD_TESTS=true \
+        -DPISTACHE_BUILD_DOCS=false \
+        -DPISTACHE_USE_SSL=true \
+        -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH/pistache \
+        ../
+   make
+   $SUDO_CMD make install
+fi
+
+popd
 
 if [ "$BUILD_YAML" ]; then
     pushd .
@@ -63,7 +100,6 @@ if [ "$BUILD_YAML" ]; then
     cd build
     cmake \
         -DBUILD_SHARED_LIBS=ON \
-        -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH \
         ..
     make
     $SUDO_CMD make install
@@ -140,5 +176,18 @@ if [ "$BUILD_ROS" ]; then
    rosdep update
 
    $SUDO_CMD apt install ros-melodic-mavros ros-melodic-mavros-extras -y 
+fi
+
+if [ "$BUILD_OCV" ]; then
+    wget https://github.com/opencv/opencv/archive/3.4.1.tar.gz
+    tar zxvf 3.4.1.tar.gz
+
+    cd opencv-3.4.1
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+    make -j4
+    $SUDO_CMD make install
 fi
 
