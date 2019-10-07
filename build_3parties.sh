@@ -25,7 +25,7 @@ usage() {
     exit 1
 }
 
-while getopts "irypzo" o; do
+while getopts "irypzso" o; do
     case "${o}" in
         i)
             THIRDPARTIES_PATH=$(realpath ${OPTARG})
