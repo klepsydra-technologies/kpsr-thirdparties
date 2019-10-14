@@ -1,6 +1,6 @@
 FROM ubuntu:18.04 AS builder
 ARG third_party_flags='-yzo'
- 
+
 # System Dependencies.
 ARG BUILD_ID='local'
 LABEL kpsr-thirdparties=builder
@@ -16,12 +16,13 @@ WORKDIR /var/tmp
 # Klepsydra
 COPY . kpsr-thirdparties
 
-RUN cd kpsr-thirdparties \ 
+RUN cd kpsr-thirdparties \
     && echo "./build_3parties.sh $third_party_flags" \
     && ./build_3parties.sh $third_party_flags
 
 
 FROM ubuntu:18.04
+LABEL kpsr-thirdparties=ZMQ
 
 COPY --from=builder /opt/klepsydra/ /opt/klepsydra/
 COPY --from=builder /usr/local/include/yaml-cpp/ /usr/local/include/yaml-cpp/
@@ -35,4 +36,3 @@ COPY --from=builder /usr/local/bin/opencv* /usr/local/bin/
 COPY --from=builder /usr/local/share/OpenCV /usr/local/share/OpenCV
 
 WORKDIR /opt/
-

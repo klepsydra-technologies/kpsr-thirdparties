@@ -1,6 +1,6 @@
 FROM ubuntu:18.04 AS builder
 ARG third_party_flags='-r'
- 
+
 # System Dependencies.
 ARG BUILD_ID='local'
 LABEL kpsr-thirdparties=builder
@@ -16,14 +16,14 @@ WORKDIR /var/tmp
 # Klepsydra
 COPY . kpsr-thirdparties
 
-RUN cd kpsr-thirdparties \ 
+RUN cd kpsr-thirdparties \
     && echo "./build_3parties.sh $third_party_flags" \
     && ./build_3parties.sh $third_party_flags
 
 
 FROM ubuntu:18.04
+kpsr-thirdparties=ROS
 
 COPY --from=builder /opt/ /opt/
 COPY --from=builder /usr/ /usr/
 WORKDIR /opt/
-

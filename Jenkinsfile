@@ -34,13 +34,4 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-          // Pruning
-          sh 'docker container prune --force --filter label=kpsr-thirdparties=builder --filter  label=BUILD_ID=${BUILD_ID}'
-          sh 'docker image prune --force --filter label=kpsr-thirdparties=builder --filter label=BUILD_ID=${BUILD_ID}'
-          sh 'docker rmi --force $(docker images --filter "reference=kpsr-thirdparties:*_${BUILD_ID}" -q)'
-        }
-    }
 }
-
