@@ -22,7 +22,7 @@ RUN cd kpsr-thirdparties \
 
 
 FROM ubuntu:18.04
-kpsr-thirdparties=ROS
+LABEL kpsr-thirdparties=ROS
 
 COPY --from=builder /opt/ /opt/
 COPY --from=builder /usr/ /usr/
