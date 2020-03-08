@@ -1,5 +1,5 @@
 FROM ubuntu:18.04 AS builder
-ARG third_party_flags='-yzo'
+ARG third_party_flags='-yz'
 
 # System Dependencies.
 ARG BUILD_ID='local'
