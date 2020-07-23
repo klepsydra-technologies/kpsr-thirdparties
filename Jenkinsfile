@@ -20,7 +20,7 @@ pipeline {
 		sh "docker build -f System_Dependencies/Dockerfile_ROS_18_04 . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID}"
                 sh "docker build -f System_Dependencies/Dockerfile_ROS_16_04 . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ros_ubuntu_16.04_${BUILD_ID}"
                 sh "docker build -f Dockerfile_ZMQ . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:ZMQ_${BUILD_ID}"
-                sh "docker build -f Dockerfile_ROS . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:ROS_${BUILD_ID}"
+                sh "docker build -f Dockerfile_ROS . --rm --build-arg=BUILD_ID=${BUILD_ID} --build-arg=ros_image=kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID} -t kpsr-thirdparties:ROS_${BUILD_ID}"
                 sh "docker build -f Dockerfile_OCV . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:OCV_${BUILD_ID}"
             }
         }
