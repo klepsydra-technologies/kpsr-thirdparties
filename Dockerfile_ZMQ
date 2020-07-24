@@ -1,6 +1,5 @@
 ARG system_image
 FROM $system_image AS builder
-ARG third_party_flags='-yzo'
 
 # System Dependencies.
 ARG BUILD_ID='local'
@@ -14,14 +13,34 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /var/tmp
 
-# Klepsydra
-COPY . kpsr-thirdparties
+# Install YAML
+RUN git clone https://github.com/jbeder/yaml-cpp && \
+    cd yaml-cpp && \
+    git checkout yaml-cpp-0.6.2 && \
+    mkdir build && cd build && cmake -DBUILD_SHARED_LIBS=ON .. && \
+    make && \
+    make install
 
-RUN cd kpsr-thirdparties \
-    && echo "./build_3parties.sh $third_party_flags" \
-    && ./build_3parties.sh $third_party_flags
+# Install ZMQ
+RUN git clone https://github.com/zeromq/libzmq.git && \
+    cd libzmq && \
+    mkdir build && \
+    cd build && \
+    cmake -DCMAKE_INSTALL_PREFIX=$THIRDPARTIES_PATH .. && \
+    make && \
+    make install
 
+# Install OpenCV
+RUN wget https://github.com/opencv/opencv/archive/3.4.1.tar.gz && \
+    tar zxvf 3.4.1.tar.gz && \
+    cd opencv-3.4.1 && \
+    mkdir build && \
+    cd build && \
+    cmake -DCMAKE_BUILD_TYPE=RELEASE .. && \
+    make -j4 && \
+    make install
 
+# Install LIBSCP
 # Add libscp
 RUN git clone https://github.com/libcsp/libcsp.git && \
   cd libcsp && \
