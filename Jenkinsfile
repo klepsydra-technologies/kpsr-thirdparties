@@ -16,11 +16,11 @@ pipeline {
         stage('Build') {
             steps {
                 // Build ZMQ and ROS
-                sh "docker build -f System_Dependencies/Dockerfile_Ubuntu_18_04 . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID}"
-		sh "docker build -f System_Dependencies/Dockerfile_ROS_18_04 . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID}"
-                sh "docker build -f System_Dependencies/Dockerfile_ROS_16_04 . --rm --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ros_ubuntu_16.04_${BUILD_ID}"
-                sh "docker build -f Dockerfile_ZMQ . --rm --build-arg=BUILD_ID=${BUILD_ID} --build-arg=system_image=kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID} -t kpsr-thirdparties:ZMQ_${BUILD_ID}"
-                sh "docker build -f Dockerfile_ROS . --rm --build-arg=BUILD_ID=${BUILD_ID} --build-arg=ros_image=kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID} -t kpsr-thirdparties:ROS_${BUILD_ID}"
+                sh "docker build -f System_Dependencies/Dockerfile_Ubuntu_18_04 . --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID}"
+		sh "docker build -f System_Dependencies/Dockerfile_ROS_18_04 . --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID}"
+                sh "docker build -f System_Dependencies/Dockerfile_ROS_16_04 . --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ros_ubuntu_16.04_${BUILD_ID}"
+                sh "docker build -f Dockerfile_ZMQ . --build-arg=BUILD_ID=${BUILD_ID} --build-arg=system_image=kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID} -t kpsr-thirdparties:ZMQ_${BUILD_ID}"
+                sh "docker build -f Dockerfile_ROS . --build-arg=BUILD_ID=${BUILD_ID} --build-arg=ros_image=kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID} -t kpsr-thirdparties:ROS_${BUILD_ID}"
             }
         }
         stage('Publish') {
