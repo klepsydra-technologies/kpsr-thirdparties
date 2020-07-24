@@ -1,4 +1,5 @@
-FROM ubuntu:18.04 AS builder
+ARG system_image
+FROM $system_image AS builder
 ARG third_party_flags='-yzo'
 
 # System Dependencies.
@@ -6,12 +7,17 @@ ARG BUILD_ID='local'
 LABEL kpsr-thirdparties=builder
 LABEL BUILD_ID=${BUILD_ID}
 
-RUN apt update && apt-get install wget libsocketcan-dev  pkg-config libssl-dev libcurl4-gnutls-dev build-essential git cmake -y --fix-missing
+RUN apt update && apt-get install wget libsocketcan-dev pkg-config libssl-dev libcurl4-gnutls-dev build-essential git cmake -y --fix-missing
 
 ENV TZ=Europe/Minsk
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /var/tmp
+
+# Add libscp
+RUN git clone https://github.com/libcsp/libcsp.git && \
+  cd libcsp && \
+  ./waf configure --enable-if-zmqhub --enable-can-socketcan build install --prefix=./install
 
 # Klepsydra
 COPY . kpsr-thirdparties
@@ -20,11 +26,6 @@ RUN cd kpsr-thirdparties \
     && echo "./build_3parties.sh $third_party_flags" \
     && ./build_3parties.sh $third_party_flags
 
-
-# Add libscp
-RUN git clone https://github.com/libcsp/libcsp.git && \
-  cd libcsp && \
-  ./waf configure --enable-if-zmqhub --enable-can-socketcan build install --prefix=./install
 
 
 FROM ubuntu:18.04
