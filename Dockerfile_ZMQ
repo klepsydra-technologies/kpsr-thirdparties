@@ -6,7 +6,7 @@ ARG BUILD_ID='local'
 LABEL kpsr-thirdparties=builder
 LABEL BUILD_ID=${BUILD_ID}
 
-RUN apt update && apt-get install wget libssl-dev libcurl4-gnutls-dev build-essential git cmake -y --fix-missing
+RUN apt update && apt-get install wget pkg-config libssl-dev libcurl4-gnutls-dev build-essential git cmake -y --fix-missing
 
 ENV TZ=Europe/Minsk
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -24,15 +24,6 @@ RUN cd kpsr-thirdparties \
 FROM ubuntu:18.04
 LABEL kpsr-thirdparties=ZMQ
 
-COPY --from=builder /opt/klepsydra/ /opt/klepsydra/
-COPY --from=builder /usr/local/include/yaml-cpp/ /usr/local/include/yaml-cpp/
-COPY --from=builder /usr/local/lib/cmake/yaml-cpp/ /usr/local/lib/cmake/yaml-cpp/
-COPY --from=builder /usr/local/lib/libyaml* /usr/local/lib/
-
-COPY --from=builder /usr/local/include/opencv/ /usr/local/include/opencv/
-COPY --from=builder /usr/local/include/opencv2/ /usr/local/include/opencv2/
-COPY --from=builder /usr/local/lib/libopencv* /usr/local/lib/
-COPY --from=builder /usr/local/bin/opencv* /usr/local/bin/
-COPY --from=builder /usr/local/share/OpenCV /usr/local/share/OpenCV
-
+COPY --from=builder /opt/ /opt/
+COPY --from=builder /usr/ /usr/
 WORKDIR /opt/
