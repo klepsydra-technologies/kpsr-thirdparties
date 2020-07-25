@@ -47,10 +47,10 @@ RUN git clone https://github.com/zeromq/czmq.git && \
     make install
 
 # Install LIBSCP
-# Add libscp
+# Add libcsp
 RUN git clone https://github.com/libcsp/libcsp.git && \
   cd libcsp && \
-  ./waf configure --enable-if-zmqhub --enable-can-socketcan build install --prefix=./install
+  ./waf configure --enable-if-zmqhub --enable-can-socketcan build install --prefix=/usr/local
 
 # Install OpenCV
 RUN wget https://github.com/opencv/opencv/archive/3.4.1.tar.gz && \
@@ -68,5 +68,6 @@ FROM ubuntu:18.04
 LABEL kpsr-thirdparties=ZMQ
 
 COPY --from=builder /opt/ /opt/
+COPY --from=builder /var/tmp/libscp /opt/libcsp
 COPY --from=builder /usr/ /usr/
 WORKDIR /opt/
