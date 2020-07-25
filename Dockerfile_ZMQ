@@ -68,6 +68,6 @@ FROM ubuntu:18.04
 LABEL kpsr-thirdparties=ZMQ
 
 COPY --from=builder /opt/ /opt/
-COPY --from=builder /var/tmp/libscp /opt/libcsp
+COPY --from=builder /var/tmp/libcsp /opt/libcsp
 COPY --from=builder /usr/ /usr/
 WORKDIR /opt/
