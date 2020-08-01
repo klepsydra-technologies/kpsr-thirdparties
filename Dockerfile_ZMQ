@@ -1,29 +1,73 @@
-FROM ubuntu:18.04 AS builder
-ARG third_party_flags='-yzo'
+ARG system_image
+FROM $system_image AS builder
 
 # System Dependencies.
 ARG BUILD_ID='local'
 LABEL kpsr-thirdparties=builder
 LABEL BUILD_ID=${BUILD_ID}
 
-RUN apt update && apt-get install wget pkg-config libssl-dev libcurl4-gnutls-dev build-essential git cmake -y --fix-missing
+RUN apt update && apt-get install wget libsocketcan-dev pkg-config libssl-dev libcurl4-gnutls-dev build-essential git cmake -y --fix-missing
 
 ENV TZ=Europe/Minsk
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /var/tmp
 
-# Klepsydra
-COPY . kpsr-thirdparties
+# Install YAML
+RUN git clone https://github.com/jbeder/yaml-cpp && \
+    cd yaml-cpp && \
+    git checkout yaml-cpp-0.6.2 && \
+    mkdir build && cd build && cmake -DBUILD_SHARED_LIBS=ON .. && \
+    make && \
+    make install
 
-RUN cd kpsr-thirdparties \
-    && echo "./build_3parties.sh $third_party_flags" \
-    && ./build_3parties.sh $third_party_flags
+# Install ZMQ
+RUN git clone https://github.com/zeromq/libzmq.git && \
+    cd libzmq && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make && \
+    make install
+
+RUN git clone https://github.com/zeromq/cppzmq.git && \
+    cd cppzmq && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make && \
+    make install
+
+RUN git clone https://github.com/zeromq/czmq.git && \
+    cd czmq && \
+    mkdir build && \
+    cd build && \
+    cmake  .. && \
+    make && \
+    make install
+
+# Install LIBSCP
+# Add libcsp
+RUN git clone https://github.com/libcsp/libcsp.git && \
+  cd libcsp && \
+  ./waf configure --enable-if-zmqhub --enable-can-socketcan build install --prefix=/usr/local
+
+# Install OpenCV
+RUN wget https://github.com/opencv/opencv/archive/3.4.1.tar.gz && \
+    tar zxvf 3.4.1.tar.gz && \
+    cd opencv-3.4.1 && \
+    mkdir build && \
+    cd build && \
+    cmake -DCMAKE_BUILD_TYPE=RELEASE .. && \
+    make -j4 && \
+    make install
+
 
 
 FROM ubuntu:18.04
 LABEL kpsr-thirdparties=ZMQ
 
 COPY --from=builder /opt/ /opt/
+COPY --from=builder /var/tmp/libcsp /opt/libcsp
 COPY --from=builder /usr/ /usr/
 WORKDIR /opt/
