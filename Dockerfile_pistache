@@ -1,0 +1,31 @@
+ARG system_image
+FROM $system_image AS builder
+
+# System Dependencies.
+ARG BUILD_ID='local'
+LABEL kpsr-thirdparties=builder
+LABEL BUILD_ID=${BUILD_ID}
+
+# Install pistache
+RUN git clone https://github.com/klepsydra-technologies/pistache.git && \
+   cd pistache && \
+   git submodule update --init && \
+   mkdir -p build && \
+   cd build && \
+   cmake -G "Unix Makefiles" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DPISTACHE_BUILD_EXAMPLES=true \
+        -DPISTACHE_BUILD_TESTS=true \
+        -DPISTACHE_BUILD_DOCS=false \
+        -DPISTACHE_USE_SSL=true \
+        .. && \
+   make && \
+   make install
+
+FROM ubuntu:18.04
+LABEL kpsr-thirdparties=pistache
+
+COPY --from=builder /usr/local/include/* /usr/local/include/*
+COPY --from=builder /usr/local/lib/* /usr/local/lib/*
+
+WORKDIR /opt/

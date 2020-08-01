@@ -1,5 +1,10 @@
 def kpsrThirdPartiesECR="337955887028.dkr.ecr.us-east-2.amazonaws.com/kpsr-docker-registry/github/kpsr-thirdparties"
 
+properties([
+  parameters([
+    string(name: 'Target', defaultValue: 'All', description: 'Which third-party to construct', )
+   ])
+])
 
 pipeline {
     agent any
