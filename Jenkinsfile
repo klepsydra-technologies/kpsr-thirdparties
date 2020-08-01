@@ -102,5 +102,19 @@ pipeline {
         }
       }
     }
+
+    stage('Build and Publish Pistache') {
+      when {
+        expression { params.build_Dockerfile_ZMQ }
+      }
+      steps {
+        sh "docker build -f Dockerfile_pistache . --build-arg=BUILD_ID=${BUILD_ID} --build-arg=system_image=kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID} -t kpsr-thirdparties:pistache_${BUILD_ID}"
+        script {
+          docker.withRegistry("https://${kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
+            sh "docker tag kpsr-thirdparties:pistache_${BUILD_ID} ${kpsrThirdPartiesECR}:pistache && docker push ${kpsrThirdPartiesECR}:pistache"
+          }
+        }
+      }
+    }
   }
 }
