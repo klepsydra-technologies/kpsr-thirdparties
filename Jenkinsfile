@@ -31,7 +31,7 @@ properties([
      defaultValue: true,
      description: 'Builds System_Dependencies/Dockerfile_ROS_16_04',
      name: 'build_Dockerfile_pistache'
-    ),
+    )
     ])
 ])
 
