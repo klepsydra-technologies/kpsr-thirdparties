@@ -64,7 +64,7 @@ RUN wget https://github.com/opencv/opencv/archive/3.4.1.tar.gz && \
 
 
 
-FROM ubuntu:18.04
+FROM  $system_image
 LABEL kpsr-thirdparties=ZMQ
 
 COPY --from=builder /opt/ /opt/

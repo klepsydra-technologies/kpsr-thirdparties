@@ -68,7 +68,7 @@ pipeline {
         script {
           docker.withRegistry("https://${kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
             sh "docker tag kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID} ${kpsrThirdPartiesECR}:sys_dep_ros_ubuntu_18.04 && docker push ${kpsrThirdPartiesECR}:sys_dep_ros_ubuntu_18.04"
-            sh "docker tag kpsr-thirdparties:ROS_${BUILD_ID} ${kpsrThirdPartiesECR}:ROS && docker push ${kpsrThirdPartiesECR}:ROS"
+            sh "docker tag kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID} ${kpsrThirdPartiesECR}:ROS && docker push ${kpsrThirdPartiesECR}:ROS"
           }
         }
       }
