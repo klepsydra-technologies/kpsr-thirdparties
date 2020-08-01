@@ -1,9 +1,38 @@
 def kpsrThirdPartiesECR="337955887028.dkr.ecr.us-east-2.amazonaws.com/kpsr-docker-registry/github/kpsr-thirdparties"
 
 properties([
-  parameters([
-    string(name: 'Target', defaultValue: 'All', description: 'Which third-party to construct', choices: ['All\nTest\nTest2'])
-   ])
+    parameters([
+    booleanParam(
+     defaultValue: true,
+     description: 'Builds System_Dependencies/Dockerfile_Ubuntu_18_04',
+     name: 'build_Dockerfile_Ubuntu_18_04'
+    ),
+    booleanParam(
+     defaultValue: true,
+     description: 'Builds System_Dependencies/Dockerfile_ROS_18_04',
+     name: 'build_Dockerfile_ROS_18_04'
+    ),
+    booleanParam(
+     defaultValue: true,
+     description: 'Builds System_Dependencies/Dockerfile_ROS_16_04',
+     name: 'build_Dockerfile_ROS_16_04'
+    ),
+    booleanParam(
+     defaultValue: true,
+     description: 'Builds System_Dependencies/Dockerfile_ROS_16_04',
+     name: 'build_Dockerfile_ZMQ'
+    ),
+    booleanParam(
+     defaultValue: true,
+     description: 'Builds System_Dependencies/Dockerfile_ZMQ',
+     name: 'build_Dockerfile_ROS'
+    ),
+    booleanParam(
+     defaultValue: true,
+     description: 'Builds System_Dependencies/Dockerfile_ROS_16_04',
+     name: 'build_Dockerfile_pistache'
+    ),
+    ])
 ])
 
 pipeline {
@@ -18,7 +47,13 @@ pipeline {
 
             }
         }
-        stage('Build') {
+        stage('Build and Publish') {
+	     when {
+		    expression { build_Dockerfile_Ubuntu_18_04 }
+		}
+	    steps { 
+                sh "echo 'Hello'"
+                }
             steps {
                 // Build ZMQ and ROS
                 sh "docker build -f System_Dependencies/Dockerfile_Ubuntu_18_04 . --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID}"
