@@ -64,7 +64,6 @@ pipeline {
       }
       steps {
         sh "docker build -f System_Dependencies/Dockerfile_ROS_18_04 . --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID}"
-        sh "docker build -f Dockerfile_ROS . --build-arg=BUILD_ID=${BUILD_ID} --build-arg=ros_image=kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID} -t kpsr-thirdparties:ROS_${BUILD_ID}"
         script {
           docker.withRegistry("https://${kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
             sh "docker tag kpsr-thirdparties:sys_dep_ros_ubuntu_18.04_${BUILD_ID} ${kpsrThirdPartiesECR}:sys_dep_ros_ubuntu_18.04 && docker push ${kpsrThirdPartiesECR}:sys_dep_ros_ubuntu_18.04"
