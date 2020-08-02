@@ -1,9 +1,0 @@
-ARG ros_image
-FROM $ros_image AS builder
-
-FROM ubuntu:18.04
-LABEL kpsr-thirdparties=ROS
-
-COPY --from=builder /opt/ /opt/
-COPY --from=builder /usr/ /usr/
-WORKDIR /opt/
