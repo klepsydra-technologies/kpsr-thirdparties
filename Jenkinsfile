@@ -1,4 +1,4 @@
-def kpsrThirdPartiesECR="337955887028.dkr.ecr.us-east-2.amazonaws.com/kpsr-docker-registry/github/kpsr-thirdparties"
+@Library('githubLibrary') _
 
 properties([
     parameters([
@@ -51,7 +51,7 @@ pipeline {
         sh "docker build -f System_Dependencies/Dockerfile_Ubuntu_18_04 . --build-arg=BUILD_ID=${BUILD_ID} -t kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID}"
         script {
           docker.withRegistry("https://${kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
-            sh "docker tag kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID} ${kpsrThirdPartiesECR}:sys_dep_ubuntu_18.04 && docker push ${kpsrThirdPartiesECR}:sys_dep_ubuntu_18.04"
+            sh "docker tag kpsr-thirdparties:sys_dep_ubuntu_18.04_${BUILD_ID} ${githubECRRoutes.kpsrThirdPartiesECR}:sys_dep_ubuntu_18.04 && docker push ${kpsrThirdPartiesECR}:sys_dep_ubuntu_18.04"
           }
         }
       }
@@ -94,7 +94,7 @@ pipeline {
       steps {
         sh "docker build -f Dockerfile_ZMQ . --build-arg=BUILD_ID=${BUILD_ID} --build-arg=system_image=kpsr-thirdparties:sys_dep_ubuntu_18.04 -t kpsr-thirdparties:ZMQ_${BUILD_ID}"
         script {
-          docker.withRegistry("https://${kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
+          docker.withRegistry("https://${githubECRRoutes.kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
             sh "docker tag kpsr-thirdparties:ZMQ_${BUILD_ID} ${kpsrThirdPartiesECR}:ZMQ && docker push ${kpsrThirdPartiesECR}:ZMQ"
             sh "docker tag kpsr-thirdparties:ZMQ_${BUILD_ID} ${kpsrThirdPartiesECR}:OCV && docker push ${kpsrThirdPartiesECR}:OCV"
           }
@@ -107,9 +107,9 @@ pipeline {
         expression { params.build_Dockerfile_pistache }
       }
       steps {
-        sh "docker build -f Dockerfile_pistache . --build-arg=BUILD_ID=${BUILD_ID} --build-arg=system_image=kpsr-thirdparties:sys_dep_ubuntu_18.04 -t kpsr-thirdparties:pistache_${BUILD_ID}"
+        sh "ECHO"
         script {
-          docker.withRegistry("https://${kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
+          docker.withRegistry("https://${githubECRRoutes.kpsrThirdPartiesECR}", "ecr:us-east-2:AWS_ECR_CREDENTIALS") {
             sh "docker tag kpsr-thirdparties:pistache_${BUILD_ID} ${kpsrThirdPartiesECR}:pistache && docker push ${kpsrThirdPartiesECR}:pistache"
           }
         }
